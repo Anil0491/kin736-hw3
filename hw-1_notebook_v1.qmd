@@ -1,0 +1,167 @@
+---
+title: "Homework assignment 1"
+author: "Anil"
+format: pdf
+---
+
+## Quarto
+
+library(babynames)
+
+
+```{r}
+library(babynames)
+library(dplyr)
+
+# 2. How many variables and observations does this package contain?
+
+dim(babynames)
+
+# 3. Create a data dictionary for each of the variables that includes the variable name,data 
+#type, and a description
+dictionary <- data.frame(
+  Variable = c("year", "sex", "name", "n", "prop"),
+  DataType = c("double", "character", "character", "integer", "double"),
+  Description = c(
+    "The year of birth of the babies",
+    "The sex of the babies (M for male, F for female)",
+    "The name given to the babies",
+    "The count of babies with the given name and sex in that year",
+    "The proportion of babies given this name out of all babies born in that year and sex"
+  )
+)
+
+print(dictionary)
+
+
+# 4. What is the range of years covered in babynames?
+
+year_range <- range(babynames$year)
+year_range
+
+
+# 5. Create an object from the babynames package that does not include the variable n.
+babynames_no_n <- babynames %>%
+  select(-n)
+
+head(babynames_no_n)
+
+
+# 7. Using the object created in Question 5, what was the most popular name for both sexesin: 
+
+# a) Most popular name in the 2nd millennium (years <= 2000)
+most_popular_2nd_millennium <- babynames_no_n %>%
+  filter(year <= 2000) %>%
+  group_by(sex, name) %>%
+  summarize(total_prop = sum(prop)) %>%
+  arrange(desc(total_prop)) %>%
+  slice(1)
+
+# b) Most popular name in the 3rd millennium (years > 2000)
+most_popular_3rd_millennium <- babynames_no_n %>%
+  filter(year > 2000) %>%
+  group_by(sex, name) %>%
+  summarize(total_prop = sum(prop)) %>%
+  arrange(desc(total_prop)) %>%
+  slice(1)
+
+# Display results
+most_popular_2nd_millennium
+most_popular_3rd_millennium
+
+
+# 8. What were the most popular names beginning with the letters Q, V, and X between 2000 and 2012?
+
+# Filter for years between 2000 and 2012
+names_2000_2012 <- babynames_no_n %>%
+  filter(year >= 2000 & year <= 2012)
+
+# Filter names starting with Q, V, and X
+popular_Q <- names_2000_2012 %>%
+  filter(startsWith(name, "Q")) %>%
+  group_by(sex, name) %>%
+  summarize(total_prop = sum(prop)) %>%
+  arrange(desc(total_prop)) %>%
+  slice(1)
+
+popular_V <- names_2000_2012 %>%
+  filter(startsWith(name, "V")) %>%
+  group_by(sex, name) %>%
+  summarize(total_prop = sum(prop)) %>%
+  arrange(desc(total_prop)) %>%
+  slice(1)
+
+popular_X <- names_2000_2012 %>%
+  filter(startsWith(name, "X")) %>%
+  group_by(sex, name) %>%
+  summarize(total_prop = sum(prop)) %>%
+  arrange(desc(total_prop)) %>%
+  slice(1)
+
+# Display results
+popular_Q
+popular_V
+popular_X
+
+
+# 9. Create a new object that retains all the variables of the babynames package, but create a new column that contains the decade each year is a part of named decade.
+
+
+# Create a new object with a decade column
+babynames_with_decade <- babynames %>%
+  mutate(decade = floor(year / 10) * 10)
+
+# 10. What is the mean and median number of female and male babies in each decade?
+
+mean_median_by_decade <- babynames_with_decade %>%
+  group_by(decade, sex) %>%
+  summarize(
+    mean_n = mean(n),
+    median_n = median(n),
+    .groups = 'drop' # ensures the result is ungrouped after summarizing
+  )
+
+
+# 11.In which decade(s) and year(s), was:
+
+# a) Find the most popular decade(s) and year(s) for "Anil"
+anil_popularity <- babynames_with_decade %>%
+  filter(name == "Anil") %>%
+  arrange(desc(n)) %>%
+  slice(1)
+
+# b) Find the most popular decade(s) and year(s) for your supervisor's name (replace "SupervisorName" with actual name)
+supervisor_popularity <- babynames_with_decade %>%
+  filter(name == "Dylan") %>%
+  arrange(desc(n)) %>%
+  slice(1)
+
+# c) Find the most popular decade(s) and year(s) for "Jack"
+jack_popularity <- babynames_with_decade %>%
+  filter(name == "Jack") %>%
+  arrange(desc(n)) %>%
+  slice(1)
+
+# Find the most popular decade(s) and year(s) for "Scott"
+scott_popularity <- babynames_with_decade %>%
+  filter(name == "Scott") %>%
+  arrange(desc(n)) %>%
+  slice(1)
+
+# View results
+anil_popularity
+supervisor_popularity
+jack_popularity
+scott_popularity
+
+
+
+
+
+```
+
+# 6. What is one reason for not including n, but keeping the variable prop?
+# One reason to to include prop (proportion) of babies of N, is that it will give you standardized measure of the amount of baby names in a given year relative to the amount of babies born that year, providing a better ability to compare names across time periods. The total amount of babies born each year is variable and the standard n (count) would not be a true representation of data. 
+
+
+
